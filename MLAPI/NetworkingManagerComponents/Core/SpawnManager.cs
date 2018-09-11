@@ -128,7 +128,6 @@ namespace MLAPI.Components
             return netObj;
         }
 
-
         internal static void RemoveOwnership(uint netId)
         {
             if (!netManager.isServer)

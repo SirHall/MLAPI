@@ -50,6 +50,11 @@ namespace MLAPI.Configuration
         [HideInInspector]
         public List<string> RegisteredScenes = new List<string>();
         /// <summary>
+        /// Should we force the 'NetworkedPrefabs' list to be identical between the clients and server?
+        /// In reality, this just changes whether or not the list is taken into account when generating hashes
+        /// </summary>
+        public bool RequireNetworkedPrefabsAreSyncronized = true;
+        /// <summary>
         /// A list of spawnable prefabs
         /// </summary>
         [HideInInspector]
@@ -314,20 +319,15 @@ namespace MLAPI.Configuration
                         writer.WriteString(Channels[i].Name);
                         writer.WriteByte((byte)Channels[i].Type);
                     }
+
                     if (EnableSceneSwitching)
-                    {
                         for (int i = 0; i < RegisteredScenes.Count; i++)
-                        {
                             writer.WriteString(RegisteredScenes[i]);
-                        }
-                    }
-                    if (HandleObjectSpawning)
-                    {
+
+                    if (HandleObjectSpawning && RequireNetworkedPrefabsAreSyncronized)
                         for (int i = 0; i < NetworkedPrefabs.Count; i++)
-                        {
                             writer.WriteString(NetworkedPrefabs[i].name);
-                        }
-                    }
+
                     writer.WriteBool(HandleObjectSpawning);
                     writer.WriteBool(EnableEncryption);
                     writer.WriteBool(EnableSceneSwitching);
