@@ -14,7 +14,7 @@ namespace MLAPI.Components
     public static class SpawnManager
     {
         /// <summary>
-        /// The currently spawned objects
+        /// The currently spawned objects indexed by their ID
         /// </summary>
         public static readonly Dictionary<uint, NetworkedObject> SpawnedObjects = new Dictionary<uint, NetworkedObject>();
         /// <summary>
@@ -53,10 +53,30 @@ namespace MLAPI.Components
         /// Returns the player object with a given clientId or null if one does not exist
         /// </summary>
         /// <returns>The player object with a given clientId or null if one does not exist</returns>
-        public static NetworkedObject GetPlayerObject(uint clientId)
+        public static NetworkedObject GetPlayerObject(uint clientID)
         {
-            if (!NetworkingManager.singleton.ConnectedClients.ContainsKey(clientId)) return null;
-            return NetworkingManager.singleton.ConnectedClients[clientId].PlayerObject;
+            if (!NetworkingManager.singleton.ConnectedClients.ContainsKey(clientID)) return null;
+            return NetworkingManager.singleton.ConnectedClients[clientID].PlayerObject;
+        }
+
+        /// <summary>
+        /// Finds all 'NetworkedObjects' that are owned by any given client
+        /// </summary>
+        /// <param name="clientID"></param>
+        /// <returns>All owned net objects by a client as an array</returns>
+        public static NetworkedObject[] GetAllNetObjectsOwnedBy(uint clientID)
+        {
+            if (!NetworkingManager.singleton.ConnectedClients.ContainsKey(clientID))
+                return new NetworkedObject[0];
+
+            //Useful if wanting to easily remove ownership of all objects owned by a client
+            var enumerator = SpawnedObjects.Values.GetEnumerator();
+            List<NetworkedObject> ownedObjects = new List<NetworkedObject>(); //Disgusting allocations
+            while (enumerator.MoveNext())
+                if (enumerator.Current.OwnerClientId == clientID)
+                    ownedObjects.Add(enumerator.Current);
+
+            return ownedObjects.ToArray();
         }
 
         internal static void RemoveOwnership(uint netId)
@@ -72,7 +92,7 @@ namespace MLAPI.Components
                 if (NetworkingManager.singleton.ConnectedClients[netObject.OwnerClientId].OwnedObjects[i].NetworkId == netId)
                     NetworkingManager.singleton.ConnectedClients[netObject.OwnerClientId].OwnedObjects.RemoveAt(i);
             }
-			netObject.OwnerClientId = NetworkingManager.singleton.ServerClientId;
+            netObject.OwnerClientId = NetworkingManager.singleton.ServerClientId;
 
             using (PooledBitStream stream = PooledBitStream.Get())
             {
@@ -315,7 +335,7 @@ namespace MLAPI.Components
             }
 
             if (payload == null) netObject.InvokeBehaviourNetworkSpawn(null);
-            else netObject.InvokeBehaviourNetworkSpawn(payload);    
+            else netObject.InvokeBehaviourNetworkSpawn(payload);
 
             foreach (var client in netManager.ConnectedClients)
             {
@@ -353,8 +373,8 @@ namespace MLAPI.Components
         {
             if (!SpawnedObjects.ContainsKey(networkId) || (netManager != null && !netManager.NetworkConfig.HandleObjectSpawning))
                 return;
-			if (!SpawnedObjects[networkId].isOwnedByServer && !SpawnedObjects[networkId].isPlayerObject && 
-			    netManager.ConnectedClients.ContainsKey(SpawnedObjects[networkId].OwnerClientId))
+            if (!SpawnedObjects[networkId].isOwnedByServer && !SpawnedObjects[networkId].isPlayerObject &&
+                netManager.ConnectedClients.ContainsKey(SpawnedObjects[networkId].OwnerClientId))
             {
                 //Someone owns it.
                 for (int i = NetworkingManager.singleton.ConnectedClients[SpawnedObjects[networkId].OwnerClientId].OwnedObjects.Count - 1; i > -1; i--)
@@ -392,5 +412,6 @@ namespace MLAPI.Components
                     SpawnedObjectsList.RemoveAt(i);
             }
         }
+
     }
 }

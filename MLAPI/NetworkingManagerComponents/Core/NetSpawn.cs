@@ -28,7 +28,7 @@ namespace MLAPI
         public static NetworkedObject Instantiate(string netPrefabName, Vector3? pos = null, Quaternion? rot = null)
         {
             if (!NetworkConfiguration.NetworkPrefabNames.ContainsValue(netPrefabName))
-                return;
+                return null;
 
             return Instantiate(
                 NetworkConfiguration.NetworkedPrefabs[NetworkConfiguration.NetworkPrefabIds[netPrefabName]],

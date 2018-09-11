@@ -37,13 +37,13 @@ namespace MLAPI
             get
             {
                 if (_ownerClientId == null)
-					return NetworkingManager.singleton != null ? NetworkingManager.singleton.ServerClientId : 0;
+                    return NetworkingManager.singleton != null ? NetworkingManager.singleton.ServerClientId : 0;
                 else
                     return _ownerClientId.Value;
             }
             internal set
             {
-				if (NetworkingManager.singleton != null && value == NetworkingManager.singleton.ServerClientId)
+                if (NetworkingManager.singleton != null && value == NetworkingManager.singleton.ServerClientId)
                     _ownerClientId = null;
                 else
                     _ownerClientId = value;
@@ -70,10 +70,10 @@ namespace MLAPI
         /// Gets if the object is the the personal clients player object
         /// </summary>
 		public bool isLocalPlayer => NetworkingManager.singleton != null && isPlayerObject && OwnerClientId == NetworkingManager.singleton.LocalClientId;
-		/// <summary>
-		/// Gets if the object is owned by the local player or if the object is the local player object
-		/// </summary>
-		public bool isOwner => NetworkingManager.singleton != null && OwnerClientId == NetworkingManager.singleton.LocalClientId;
+        /// <summary>
+        /// Gets if the object is owned by the local player or if the object is the local player object
+        /// </summary>
+        public bool isOwner => NetworkingManager.singleton != null && OwnerClientId == NetworkingManager.singleton.LocalClientId;
         /// <summary>
         /// Gets wheter or not the object is owned by anyone
         /// </summary>
@@ -163,7 +163,7 @@ namespace MLAPI
             for (int i = 0; i < childNetworkedBehaviours.Count; i++)
             {
                 //We check if we are it's networkedObject owner incase a networkedObject exists as a child of our networkedObject.
-                if(!childNetworkedBehaviours[i].networkedStartInvoked)
+                if (!childNetworkedBehaviours[i].networkedStartInvoked)
                 {
                     childNetworkedBehaviours[i].InternalNetworkStart();
                     childNetworkedBehaviours[i].NetworkStart(stream);
@@ -177,7 +177,7 @@ namespace MLAPI
         {
             get
             {
-                if(_childNetworkedBehaviours == null)
+                if (_childNetworkedBehaviours == null)
                 {
                     _childNetworkedBehaviours = new List<NetworkedBehaviour>();
                     NetworkedBehaviour[] behaviours = GetComponentsInChildren<NetworkedBehaviour>();
@@ -198,7 +198,7 @@ namespace MLAPI
                 NetworkedBehaviours[i].NetworkedVarUpdate();
             }
         }
-        
+
         internal void WriteNetworkedVarData(Stream stream, uint clientId)
         {
             using (PooledBitWriter writer = PooledBitWriter.Get(stream))
